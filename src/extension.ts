@@ -12,7 +12,11 @@ export function activate(context: vscode.ExtensionContext) {
                 vscode.ViewColumn.Beside,
                 {
                     enableScripts: true,
-                    localResourceRoots: [vscode.Uri.file(path.join(context.extensionPath, 'src', 'webview'))],
+                    // Include the directory of the XML document in localResourceRoots
+                    localResourceRoots: [
+                        vscode.Uri.file(path.join(context.extensionPath, 'src', 'webview')),
+                        vscode.Uri.joinPath(editor.document.uri, '..')
+                    ],
                 }
             );
 
@@ -41,66 +45,137 @@ async function updateWebviewContent(
     xmlDocument: vscode.TextDocument
 ) {
     const xmlContent = xmlDocument.getText();
-    const xslHref = extractXslHref(xmlContent);
+    const stylesheetRefs = extractStylesheetRefs(xmlContent);
 
-    if (xslHref) {
-        const xslUri = vscode.Uri.joinPath(xmlDocument.uri, '..', xslHref);
-        try {
-            const xslDocument = await vscode.workspace.openTextDocument(xslUri);
-            const xslContent = xslDocument.getText();
+    const cssFiles: vscode.Uri[] = [];
+    let xslContent: string | null = null;
 
-            const htmlContent = generateWebviewContent(panel, xmlContent, xslContent);
-            panel.webview.html = htmlContent;
-        } catch (error) {
-            let errorMessage = 'Unknown error';
-            if (error instanceof Error) {
-                errorMessage = error.message;
+    for (const ref of stylesheetRefs) {
+        if (ref.type === 'text/css') {
+            const cssUri = vscode.Uri.joinPath(xmlDocument.uri, '..', ref.href);
+            cssFiles.push(cssUri);
+        } else if (ref.type === 'text/xsl') {
+            const xslUri = vscode.Uri.joinPath(xmlDocument.uri, '..', ref.href);
+            try {
+                const xslDocument = await vscode.workspace.openTextDocument(xslUri);
+                xslContent = xslDocument.getText();
+            } catch (error) {
+                let errorMessage = 'Unknown error';
+                if (error instanceof Error) {
+                    errorMessage = error.message;
+                }
+                panel.webview.html = getErrorContent(`Error loading XSL file: ${errorMessage}`);
+                return;
             }
-            panel.webview.html = getErrorContent(`Error loading XSL file: ${errorMessage}`);
         }
-    } else {
-        panel.webview.html = getErrorContent('No XSL stylesheet reference found in the XML document.');
     }
+
+    // Update localResourceRoots to include CSS directories
+    const cssDirectories = cssFiles.map(cssUri => vscode.Uri.joinPath(cssUri, '..'));
+    panel.webview.options = {
+        ...panel.webview.options,
+        localResourceRoots: [
+            ...(panel.webview.options.localResourceRoots || []),
+            ...cssDirectories
+        ]
+    };
+
+    const htmlContent = generateWebviewContent(panel, xmlContent, xslContent, cssFiles);
+    panel.webview.html = htmlContent;
 }
 
-function extractXslHref(xmlContent: string): string | null {
-    const match = xmlContent.match(/<\?xml-stylesheet.*href=["'](.+?)["']/);
-    return match ? match[1] : null;
+function extractStylesheetRefs(xmlContent: string): { href: string; type: string }[] {
+    const regex = /<\?xml-stylesheet\s+(.*?)\?>/g;
+    let match;
+    const refs: { href: string; type: string }[] = [];
+
+    while ((match = regex.exec(xmlContent)) !== null) {
+        const attrs = match[1];
+        const hrefMatch = attrs.match(/href=["'](.+?)["']/);
+        const typeMatch = attrs.match(/type=["'](.+?)["']/);
+        if (hrefMatch && typeMatch) {
+            refs.push({ href: hrefMatch[1], type: typeMatch[1] });
+        }
+    }
+
+    return refs;
 }
 
 function generateWebviewContent(
     panel: vscode.WebviewPanel,
     xmlContent: string,
-    xslContent: string
+    xslContent: string | null,
+    cssFiles: vscode.Uri[]
 ): string {
     const nonce = getNonce();
+
+    // Prepare CSS links
+    const cssLinks = cssFiles.map(cssUri => {
+        const webviewUri = panel.webview.asWebviewUri(cssUri);
+        return `<link rel="stylesheet" type="text/css" href="${webviewUri}">`;
+    }).join('\n');
+
+    // Adjust CSP to allow styles and resources from the webview URIs
+    const cspSource = panel.webview.cspSource;
+    const csp = `
+        default-src 'none';
+        script-src 'nonce-${nonce}';
+        style-src 'unsafe-inline' ${cspSource};
+        font-src ${cspSource};
+        img-src ${cspSource} data:;
+    `;
+
+    let transformationScript = '';
+
+    if (xslContent) {
+        // XSLT transformation script
+        transformationScript = `
+            (function() {
+                const parser = new DOMParser();
+                const xmlString = \`${xmlContent.replace(/`/g, '\\`')}\`;
+                const xslString = \`${xslContent.replace(/`/g, '\\`')}\`;
+
+                const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+                const xslDoc = parser.parseFromString(xslString, 'text/xml');
+
+                const xsltProcessor = new XSLTProcessor();
+                xsltProcessor.importStylesheet(xslDoc);
+
+                const resultDocument = xsltProcessor.transformToFragment(xmlDoc, document);
+
+                document.getElementById('content').appendChild(resultDocument);
+            })();
+        `;
+    } else {
+        // Display the XML content directly
+        transformationScript = `
+            (function() {
+                const parser = new DOMParser();
+                const xmlString = \`${xmlContent.replace(/`/g, '\\`')}\`;
+                const xmlDoc = parser.parseFromString(xmlString, 'application/xml');
+
+                const serializer = new XMLSerializer();
+                const xmlHtml = serializer.serializeToString(xmlDoc);
+
+                document.getElementById('content').innerHTML = xmlHtml;
+            })();
+        `;
+    }
+
     return `
     <!DOCTYPE html>
     <html lang="en">
     <head>
       <meta charset="UTF-8">
       <!-- CSP to only allow scripts with the nonce -->
-      <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${nonce}'; style-src 'unsafe-inline';">
+      <meta http-equiv="Content-Security-Policy" content="${csp}">
       <title>XML Preview</title>
+      ${cssLinks}
     </head>
     <body>
       <div id="content"></div>
       <script nonce="${nonce}">
-        (function() {
-          const parser = new DOMParser();
-          const xmlString = \`${xmlContent.replace(/`/g, '\\`')}\`;
-          const xslString = \`${xslContent.replace(/`/g, '\\`')}\`;
-
-          const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
-          const xslDoc = parser.parseFromString(xslString, 'text/xml');
-
-          const xsltProcessor = new XSLTProcessor();
-          xsltProcessor.importStylesheet(xslDoc);
-
-          const resultDocument = xsltProcessor.transformToFragment(xmlDoc, document);
-
-          document.getElementById('content').appendChild(resultDocument);
-        })();
+        ${transformationScript}
       </script>
     </body>
     </html>
