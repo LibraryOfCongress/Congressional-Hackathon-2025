@@ -33,5 +33,8 @@
     "@types/vscode": "^1.95.0",
     "@vscode/test-electron": "^2.4.1",
     "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "node-fetch": "^2.7.0"
   }
 }

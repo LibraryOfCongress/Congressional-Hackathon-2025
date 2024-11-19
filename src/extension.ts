@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import fetch from 'node-fetch'; // Install node-fetch if not already installed
 
 export function activate(context: vscode.ExtensionContext) {
     const disposable = vscode.commands.registerCommand('xmlPreview.start', () => {
@@ -47,18 +48,46 @@ async function updateWebviewContent(
     const xmlContent = xmlDocument.getText();
     const stylesheetRefs = extractStylesheetRefs(xmlContent);
 
-    const cssFiles: vscode.Uri[] = [];
+    const cssContents: string[] = [];
     let xslContent: string | null = null;
 
     for (const ref of stylesheetRefs) {
         if (ref.type === 'text/css') {
-            const cssUri = vscode.Uri.joinPath(xmlDocument.uri, '..', ref.href);
-            cssFiles.push(cssUri);
+            if (isExternalUrl(ref.href)) {
+                try {
+                    const cssContent = await fetchCssContent(ref.href);
+                    // Handle relative URLs within the CSS content
+                    const adjustedCssContent = adjustCssUrls(cssContent, ref.href, panel);
+                    cssContents.push(adjustedCssContent);
+                } catch (error) {
+                    let errorMessage = 'Unknown error';
+                    if (error instanceof Error) {
+                        errorMessage = error.message;
+                    }
+                    panel.webview.html = getErrorContent(`Error loading external CSS file: ${errorMessage}`);
+                    return;
+                }
+            } else {
+                const cssUri = vscode.Uri.joinPath(xmlDocument.uri, '..', ref.href);
+                try {
+                    const cssDocument = await vscode.workspace.openTextDocument(cssUri);
+                    cssContents.push(cssDocument.getText());
+                } catch (error) {
+                    let errorMessage = 'Unknown error';
+                    if (error instanceof Error) {
+                        errorMessage = error.message;
+                    }
+                    panel.webview.html = getErrorContent(`Error loading CSS file: ${errorMessage}`);
+                    return;
+                }
+            }
         } else if (ref.type === 'text/xsl') {
-            const xslUri = vscode.Uri.joinPath(xmlDocument.uri, '..', ref.href);
+            const xslUri = isExternalUrl(ref.href)
+                ? vscode.Uri.parse(ref.href)
+                : vscode.Uri.joinPath(xmlDocument.uri, '..', ref.href);
             try {
-                const xslDocument = await vscode.workspace.openTextDocument(xslUri);
-                xslContent = xslDocument.getText();
+                const xslContentResult = await fetchXslContent(xslUri);
+                xslContent = xslContentResult;
             } catch (error) {
                 let errorMessage = 'Unknown error';
                 if (error instanceof Error) {
@@ -70,17 +99,7 @@ async function updateWebviewContent(
         }
     }
 
-    // Update localResourceRoots to include CSS directories
-    const cssDirectories = cssFiles.map(cssUri => vscode.Uri.joinPath(cssUri, '..'));
-    panel.webview.options = {
-        ...panel.webview.options,
-        localResourceRoots: [
-            ...(panel.webview.options.localResourceRoots || []),
-            ...cssDirectories
-        ]
-    };
-
-    const htmlContent = generateWebviewContent(panel, xmlContent, xslContent, cssFiles);
+    const htmlContent = generateWebviewContent(panel, xmlContent, xslContent, cssContents);
     panel.webview.html = htmlContent;
 }
 
@@ -101,19 +120,57 @@ function extractStylesheetRefs(xmlContent: string): { href: string; type: string
     return refs;
 }
 
+function isExternalUrl(url: string): boolean {
+    return /^(https?:)?\/\//.test(url);
+}
+
+async function fetchCssContent(url: string): Promise<string> {
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error(`Failed to fetch CSS file: ${response.statusText}`);
+    }
+    return await response.text();
+}
+
+async function fetchXslContent(uri: vscode.Uri): Promise<string> {
+    if (uri.scheme === 'http' || uri.scheme === 'https') {
+        const response = await fetch(uri.toString());
+        if (!response.ok) {
+            throw new Error(`Failed to fetch XSL file: ${response.statusText}`);
+        }
+        return await response.text();
+    } else {
+        const xslDocument = await vscode.workspace.openTextDocument(uri);
+        return xslDocument.getText();
+    }
+}
+
+function adjustCssUrls(cssContent: string, cssUrl: string, panel: vscode.WebviewPanel): string {
+    // Adjust relative URLs in CSS content to absolute URLs
+    const urlRegex = /url\(['"]?(.*?)['"]?\)/g;
+    return cssContent.replace(urlRegex, (match, p1) => {
+        let url = p1.trim();
+        if (!isExternalUrl(url) && !url.startsWith('data:')) {
+            // Resolve relative URLs
+            const baseUri = vscode.Uri.parse(cssUrl);
+            const resolvedUri = vscode.Uri.joinPath(baseUri, '..', url);
+            const webviewUri = panel.webview.asWebviewUri(resolvedUri);
+            return `url('${webviewUri}')`;
+        }
+        return match;
+    });
+}
+
 function generateWebviewContent(
     panel: vscode.WebviewPanel,
     xmlContent: string,
     xslContent: string | null,
-    cssFiles: vscode.Uri[]
+    cssContents: string[]
 ): string {
     const nonce = getNonce();
 
-    // Prepare CSS links
-    const cssLinks = cssFiles.map(cssUri => {
-        const webviewUri = panel.webview.asWebviewUri(cssUri);
-        return `<link rel="stylesheet" type="text/css" href="${webviewUri}">`;
-    }).join('\n');
+    // Prepare CSS style tags
+    const cssStyles = cssContents.map(css => `<style>${css}</style>`).join('\n');
 
     // Adjust CSP to allow styles and resources from the webview URIs
     const cspSource = panel.webview.cspSource;
@@ -132,8 +189,8 @@ function generateWebviewContent(
         transformationScript = `
             (function() {
                 const parser = new DOMParser();
-                const xmlString = \`${xmlContent.replace(/`/g, '\\`')}\`;
-                const xslString = \`${xslContent.replace(/`/g, '\\`')}\`;
+                const xmlString = \`${escapeBackticks(xmlContent)}\`;
+                const xslString = \`${escapeBackticks(xslContent)}\`;
 
                 const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
                 const xslDoc = parser.parseFromString(xslString, 'text/xml');
@@ -151,7 +208,7 @@ function generateWebviewContent(
         transformationScript = `
             (function() {
                 const parser = new DOMParser();
-                const xmlString = \`${xmlContent.replace(/`/g, '\\`')}\`;
+                const xmlString = \`${escapeBackticks(xmlContent)}\`;
                 const xmlDoc = parser.parseFromString(xmlString, 'application/xml');
 
                 const serializer = new XMLSerializer();
@@ -170,7 +227,7 @@ function generateWebviewContent(
       <!-- CSP to only allow scripts with the nonce -->
       <meta http-equiv="Content-Security-Policy" content="${csp}">
       <title>XML Preview</title>
-      ${cssLinks}
+      ${cssStyles}
     </head>
     <body>
       <div id="content"></div>
@@ -180,6 +237,10 @@ function generateWebviewContent(
     </body>
     </html>
   `;
+}
+
+function escapeBackticks(str: string): string {
+    return str.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$/g, '\\$');
 }
 
 function getErrorContent(errorMessage: string): string {
