@@ -1,9 +1,9 @@
 {
-  "name": "xml-preview-extension",
-  "displayName": "XML Preview Extension",
+  "name": "vscode-xml-preview",
+  "displayName": "VSCode XML Preview Extension",
   "description": "Provides a formatted preview for XML documents based on XSL stylesheets.",
   "version": "1.0.0",
-  "publisher": "your-name",
+  "publisher": "Max Rakhimov",
   "engines": {
     "vscode": "^1.95.0"
   },
@@ -18,7 +18,7 @@
     "commands": [
       {
         "command": "xmlPreview.start",
-        "title": "Start XML Preview"
+        "title": "Open XML Preview"
       }
     ]
   },
