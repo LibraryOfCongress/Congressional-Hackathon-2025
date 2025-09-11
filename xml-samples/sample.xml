@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="sample.xsl"?>
+<!-- XML Sample: Legislation -->
+<legislation>
+    <title>Clean Water and Air Act of 2024</title>
+    <number>H.R. 1234</number>
+    <sponsor>
+        <name>John Doe</name>
+        <position>Representative</position>
+        <state>California</state>
+    </sponsor>
+    <dateIntroduced>2024-01-10</dateIntroduced>
+    <summary>The Clean Water Act of 2024 aims to protect and improve the quality of water resources
+        by regulating pollutants, promoting sustainability, and providing funding for environmental
+        programs.</summary>
+    <sections>
+        <section>
+            <title>Section 1: Short Title</title>
+            <text>This Act may be cited as the "Clean Water Act of 2024".</text>
+        </section>
+        <section>
+            <title>Section 2: Findings and Purpose</title>
+            <text>The Congress finds that water is a critical resource for public health,
+                agriculture, and industry. This Act aims to ensure safe and clean water for all
+                citizens.</text>
+        </section>
+        <section>
+            <title>Section 3: Prohibited Activities</title>
+            <text>No person may discharge pollutants into navigable waters without a permit issued
+                under this Act.</text>
+        </section>
+    </sections>
+</legislation>
