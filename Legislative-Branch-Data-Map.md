@@ -33,7 +33,8 @@ This data map is a product of the [Congressional Data Task Force](https://usgpo.
 | [Clerk.House.gov](https://clerk.house.gov) | House Clerk. Best for: Members, Member photos, votes, floor, disclosures. | Web/XML | Daily | House | Primary House data feeds | General / Portal |
 | [LOC.gov](https://loc.gov) | Library of Congress. Best for: Research & collections. | Web | Daily | LOC | Includes CRS & Law Library | General / Portal |
 | [GPO.gov](https://gpo.gov) | GPO portal. Best for: Publications & services. | PDF, XML | Daily | GPO | Entry to govinfo.gov | General / Portal |
-| [CRS.gov](https://crs.gov) | CRS portal. Best for: Policy analysis. | PDF | As published | LOC (CRS) | Limited public access | Research / Policy |
+| [CRS.gov](https://crs.gov) | CRS portal. Best for: Policy analysis. | PDF | As published | LOC (CRS) | No public access | Research / Policy |
+| [Law Library Legal Reports](https://www.loc.gov/research-centers/law-library-of-congress/legal-reports/) | Law Library of Congress Legal Reports. Best for: Foreign law policy analysis. | PDF | As published | LOC (Law Library) | Public access | Research / Policy |
 | [GovInfo.gov](https://govinfo.gov) | Primary docs. Best for: Bills, laws, reports. | XML, TXT, USLM | Daily | GPO | Bulk & API access available | Legislation / Docs |
 | [CBO.gov](https://cbo.gov) | CBO portal. Best for: Cost estimates & reports. | PDF, XLSX | As published | CBO |  | Legislation / Fiscal Analysis |
 | [GAO.gov](https://gao.gov) | GAO portal. Best for: Audits & evaluations. | PDF, XLSX | As published | GAO |  | Oversight / GAO |
@@ -44,6 +45,12 @@ This data map is a product of the [Congressional Data Task Force](https://usgpo.
 |----|----|----|----|----|----|----|
 | [Member Info](https://member-info.house.gov/members.xml) | House members. Best for: Member roster. | XML | Daily | House | Based on Clerk and CAO data; updated after memberData.xml is updated | Members / IDs |
 | [Clerk MemberData XML](https://clerk.house.gov/xml/lists/MemberData.xml) | House members. Best for: Member list. | XML | Daily | House | Published by House Clerk | Members / IDs |
+| [Clerk Financial Disclosure Reports]([https://clerk.house.gov/xml/lists/MemberData.xml](https://disclosures-clerk.house.gov/FinancialDisclosure)) | House members. Best for: Member financial disclosure reports. | PDF | Daily | House | Published by House Clerk | Members / Ethics |
+| [Clerk Foriegn Travel Reports](https://disclosures-clerk.house.gov/ForeignTravel) | House members. Best for: Foreign travel reports. | PDF and Text | Daily | House | Published by House Clerk | Members / Travel |
+| [Clerk Gift Travel Filings](https://disclosures-clerk.house.gov/GiftTravelFilings) | House members. Best for: Gift travel filings. | ZIP | Annual | House | Published by House Clerk | Members / Travel |
+| [Clerk Unsolicited Mass Communications](https://masscommsdisclosure.house.gov/) | House members. Best for: Mass communications. | PDF  | Daily | House | Published by House Clerk | Members / Communications |
+| [Post-Employment Notifications](https://disclosures-clerk.house.gov/PostEmploymentNotification) | House members. Best for: Post Employment Communications. | ZIP  |  | House | Published by House Clerk | Members / Ethics |
+| [Lobbying Disclosure](https://lobbyingdisclosure.house.gov/) | Lobbyists. Best for: Lobbying filings and campaign contributions. | XML  |  | House | Published by House Clerk | Members / Ethics |
 | [Bioguide](https://bioguide.congress.gov) | Member directory. Best for: Unique IDs & photos. | XML, JSON | As updated | LOC | Maintained by LOC & historians | Members / IDs |
 | [Senate committee memberships](https://www.senate.gov/general/committee_membership/) | Committee rosters. Best for: Membership by committee. | Web/XML | As updated | Senate |  | Committees / Membership |
 | [Senate contact info XML](https://www.senate.gov/general/contact_information/senators_cfm.xml) | Senator contacts. Best for: Official info. | XML | As updated | Senate |  | Members / Contacts |
