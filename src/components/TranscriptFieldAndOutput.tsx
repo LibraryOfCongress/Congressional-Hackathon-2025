@@ -18,7 +18,7 @@ export default function TranscriptFieldAndOutput(): JSX.Element {
         try {
             const response = await axios.post("/api", fileContent)
             setAILoading(false)
-            setAIOutput(response.data.output[1].content[0].text)
+            setAIOutput(response.data)
         } catch (error) {
             console.error("There was an error calling the LLM", error)
             setAILoading(false)
