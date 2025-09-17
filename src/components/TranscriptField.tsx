@@ -5,12 +5,16 @@ import { useState, ChangeEvent, DragEvent, JSX } from "react";
 export default function TranscriptField(): JSX.Element {
     
     const [fileContent, setFileContent] = useState<string>('');
+    const [fileName, setFileCName] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState<boolean>(false);
 
   const handleFile = (file: File): void => {
     if (file.type !== 'text/plain') {
       alert('Only .txt files are supported');
       return;
+    }
+    if (file) {
+        setFileCName(file.name)
     }
 
     const reader = new FileReader();
@@ -54,8 +58,10 @@ export default function TranscriptField(): JSX.Element {
     onDragOver={handleDrag}
     onDragLeave={handleDrag}
     onDrop={handleDrop}
-    className="bg-white rounded-xl p-8 text-center"
+    className={`${dragActive ? 'bg-blue-50' : 'bg-white'} rounded-xl p-8 text-center`}
   >
+    {!fileName ?
+    <>
     <p className="text-gray-700">Drag and drop a transcript file here, or click to upload</p>
     <input
       type="file"
@@ -67,6 +73,22 @@ export default function TranscriptField(): JSX.Element {
     <label htmlFor="fileUpload" className="cursor-pointer text-blue-600 underline">
       Browse Files
     </label>
+    </>
+    :
+    <>
+    <p className="text-gray-700">"{fileName}" selected</p>
+    <input
+      type="file"
+      accept=".txt"
+      onChange={handleChange}
+      className="hidden"
+      id="fileUpload"
+    />
+    <label htmlFor="fileUpload" className="cursor-pointer text-blue-600 underline">
+      Update Selected File
+    </label>
+    </>
+    }
   </div>
 </div>
   );
