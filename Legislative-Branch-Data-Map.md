@@ -55,7 +55,6 @@ This data map is a product of the [Congressional Data Task Force](https://usgpo.
 | [House Post-Employment Notifications](https://disclosures-clerk.house.gov/PostEmploymentNotification) | House members. Best for: Post Employment Communications. | ZIP  |  | House | Published by House Clerk | Members / Ethics |
 | [House Lobbying Disclosure](https://lobbyingdisclosure.house.gov/) | Lobbyists. Best for: Lobbying filings and campaign contributions. | XML  |  | House | Published by House Clerk | Members / Ethics |
 | [Bioguide](https://bioguide.congress.gov) | Member directory. Best for: Unique IDs & photos. | XML, JSON | As updated | LOC | Maintained by LOC & historians | Members / IDs |
-| [Senate committee memberships](https://www.senate.gov/general/committee_membership/committee_memberships_SSAP.xml) | Committee rosters. Best for: Membership by committee. | Web/XML | As updated | Senate |  | Committees / Membership |
 | [Senate contact info XML](https://www.senate.gov/general/contact_information/senators_cfm.xml) | Senator contacts. Best for: Official info. | XML | As updated | Senate |  | Members / Contacts |
 | [Senate LIS Member Data](https://www.senate.gov/legislative/LIS_MEMBER/cvc_member_data.xml) | LIS data feed. Best for: Senate members. | XML | Daily | Senate | IDs differ from Bioguide | Members / IDs |
 | [Senate Financial Disclosure Database](https://efdsearch.senate.gov/search/home/) | Senate electronic Financial Disclosures. Best for: reviewing financial disclosures from 2012-present for members and candidates. | PDF | Daily | Senate |  | Members / candidates |
@@ -63,15 +62,26 @@ This data map is a product of the [Congressional Data Task Force](https://usgpo.
 | [Senate Lobbying Disclosure](https://lda.senate.gov/system/public/) | Senate lobbying disclosure act reports: registrations, quarterly activity, and contribution reports. Best for: lobbying disclosures. | Database and API  | Daily | Senate | Ethics | Lobbyists |
 | [Senate Post Employment Lobbying Disclosure](https://www.senate.gov/pagelayout/legislative/g_three_sections_with_teasers/lobbyingdisc.htm) | Senate post employment lobbying restrictions. Best for: identifying former staff lobbying black-out period. | HTMML  | Annual | Senate | Ethics | Former staff |
 
+### Committees
+
+| Source / Tool | Description | Data | Update | Origin | Notes | Tags |
+|----|----|----|----|----|----|----|
+| [Docs.House.gov Committee](https://docs.house.gov/committee) | Committee repository. Best for: Hearings & docs. | XML | Daily | House | Covers \~15 years | Committees / Hearings |
+| [Senate Hearings XML](https://www.senate.gov/general/committee_schedules/hearings.xml) | Hearing schedule. Best for: Senate committees. | XML | Daily | Senate |  | Committees / Hearings |
+| [House Committee Reports by Congress](https://cha.house.gov/committee-reports) | Monthly reports on expenditures by committee. Best for: House committee spending. | PDF | Monthly | House | Stays in PDF | Admin / Finance |
+| [Unique IDs for committees and subcommittees](https://clerk.house.gov/xml/lists/MemberData.xml) | Committees and subcommittees have unique IDs. Control+F for appropriations to get a list of all the IDs. Best for: unqiue identifiers for committees. | XML |  | House |  | Committees |
+| [Senate committee memberships](https://www.senate.gov/general/committee_membership/committee_memberships_SSAP.xml) | Committee rosters. Best for: Membership by committee. | Web/XML | As updated | Senate |  | Committees / Membership |
+| [Reports due to Congress from agencies](https://www.gpo.gov/how-to-work-with-us/agency/congressionally-mandated-reports) | Mandated agency reports to congress. Best for: oversight. | API, PDF | As updated | House + Senate |  | Reports |
+
+
+
 ### Events
 
 | Source / Tool | Description | Data | Update | Origin | Notes | Tags |
 |----|----|----|----|----|----|----|
 | [Senate Floor Video](https://www.senate.gov/legislative/floor_activity_pail.htm) | Streaming video. Best for: Senate floor. | Streaming | Real-time | Senate |  | Media / Video |
 | [House Floor Summary](https://clerk.house.gov/floorsummary/floor-download.aspx) | Floor summary. Best for: House floor actions. | Various | Real-time | House | Download formats available | Legislation / Floor |
-| [Docs.House.gov Committee](https://docs.house.gov/committee) | Committee repository. Best for: Hearings & docs. | XML | Daily | House | Covers \~15 years | Committees / Hearings |
 | [Senate Schedule XML](https://www.senate.gov/legislative/2025_schedule.xml) | Senate schedule. Best for: Floor calendar. | XML | Daily | Senate |  | Legislation / Floor |
-| [Senate Hearings XML](https://www.senate.gov/general/committee_schedules/hearings.xml) | Hearing schedule. Best for: Senate committees. | XML | Daily | Senate |  | Committees / Hearings |
 | [Senate LIS Floor Activity](https://www.senate.gov/legislative/LIS/floor_activity/) | Floor activity. Best for: Senate floor actions. | XML | Real-time | Senate |  | Legislation / Floor |
 
 ### Legislative
@@ -113,7 +123,8 @@ This data map is a product of the [Congressional Data Task Force](https://usgpo.
 | [Congressional Data Task Force Innovation Hub](https://usgpo.github.io/innovation/) | Standards hub. Best for: USLM/XML resources. | Web | Ongoing | GPO | Links to XML WG | Tools / Standards |
 | [House Statement of Disbursements](https://www.house.gov/the-house-explained/open-government/statement-of-disbursements) | Office expenditures. Best for: House-level spending. | CSV, PDF | Quarterly | House | Recent years are spreadsheets | Admin / Finance |
 | [Senate Statement of Official and Personnel Expense Accounts SOPOEA](https://www.senate.gov/legislative/common/generic/report_secsen.htm) | Office expenditures. Best for: Senate-level spending. | PDF | Quarterly | Senate | Stays in PDF | Admin / Finance |
-| [House Committee Reports by Congress](https://cha.house.gov/committee-reports) | Monthly reports on expenditures by committee. Best for: House committee spending. | PDF | Monthly | House | Stays in PDF | Admin / Finance |
+| [Congressional district maps as shapefiles](https://kml.house.gov/) | Maps of congressional district as shapefiles. | KML |  | House |  | Districts |
+
 
 ### Other Non-Legislative
 
