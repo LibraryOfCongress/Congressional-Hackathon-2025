@@ -8,7 +8,9 @@ Different shapefile approaches were used:
 - District shapefiles are from [The Downballot's maps database](https://docs.google.com/spreadsheets/d/13XkF59JKzvw4SeSq5mbgIFrJfYjK4amg9JoQE5e9grQ/edit?gid=0#gid=0).
 - KML files from https://kml.house.gov/
 
-We investigated [Congressional District-level Impact of Abolishing the SALT Deduction](salt_impact_by_district.png).
+We investigated Abolishing the SALT Deduction and it's impacts:
+
+![Congressional District-level Impact of Abolishing the SALT Deduction](salt_impact_by_district.png).
 
 
 ### Animated Transition Idea
