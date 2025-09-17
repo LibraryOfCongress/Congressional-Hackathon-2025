@@ -1,8 +1,12 @@
 # Witness Witness
 
+![Witness Witness Banner](./photos/banner.png)
+
+###### *A Nick Nick creation*
+
 This is a proof of concept for creating a tracker history of Congressional hearing witnesses. We scrape data from both House and Senate hearings and compile it into a searchable database. The front end is a simple static web page that queries the database and displays results.  Our intent is that this can be used to empower researchers, journalists, and the public to better understand the relationships between who testifies before Congress and the topics they discuss.
 
-The project was created for the [Congressional Hackathon 2025](https://congressionalhackathon.devpost.com/) and everything needed to run it is included in this folder (`witnessWitness/`).
+The project was created for the [Congressional Hackathon 2025](https://www.house.gov/Hackathon) and everything needed to run it is included in this folder (`witnessWitness/`).
 
 ## Run the explorer locally
 
@@ -27,6 +31,19 @@ If running from the `witnessWitness` folder, follow these steps:
    - npm http-server: `npx http-server .` (after `npm init -y` and `npm install --save-dev http-server`)
 2. Open your browser to `http://localhost:8000/` (or the port shown in the server output).
 3. Interact with `index.html` to explore witnesses, filter hearings, and follow hearing links.
+
+### Using the web app
+
+The web app is a simple static page (`index.html`) that queries the combined SQLite database (`hearings_combined.db`).  It allows you to search for witnesses, filter hearings by date range and keywords, and view details about each hearing.
+
+Some example searches to try:
+
+|      |
+| :---:|
+| ![top5](./photos/top5total.png) |
+| We keep a running list of the top witnesses based on your search criteria.  Above is the top five overall witnesses.  |
+| ![search](./photos/ag.png) |
+| You can search for specific witnesses by name, or look for committees or topics.  |
 
 
 ## House Database
