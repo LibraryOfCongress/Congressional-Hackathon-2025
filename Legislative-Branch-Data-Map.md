@@ -52,7 +52,7 @@ This data map is a product of the [Congressional Data Task Force](https://usgpo.
 | [Post-Employment Notifications](https://disclosures-clerk.house.gov/PostEmploymentNotification) | House members. Best for: Post Employment Communications. | ZIP  |  | House | Published by House Clerk | Members / Ethics |
 | [Lobbying Disclosure](https://lobbyingdisclosure.house.gov/) | Lobbyists. Best for: Lobbying filings and campaign contributions. | XML  |  | House | Published by House Clerk | Members / Ethics |
 | [Bioguide](https://bioguide.congress.gov) | Member directory. Best for: Unique IDs & photos. | XML, JSON | As updated | LOC | Maintained by LOC & historians | Members / IDs |
-| [Senate committee memberships](https://www.senate.gov/general/committee_membership/) | Committee rosters. Best for: Membership by committee. | Web/XML | As updated | Senate |  | Committees / Membership |
+| [Senate committee memberships](https://www.senate.gov/general/committee_membership/committee_memberships_SSAP.xml) | Committee rosters. Best for: Membership by committee. | Web/XML | As updated | Senate |  | Committees / Membership |
 | [Senate contact info XML](https://www.senate.gov/general/contact_information/senators_cfm.xml) | Senator contacts. Best for: Official info. | XML | As updated | Senate |  | Members / Contacts |
 | [Senate LIS Member Data](https://www.senate.gov/legislative/LIS_MEMBER/cvc_member_data.xml) | LIS data feed. Best for: Senate members. | XML | Daily | Senate | IDs differ from Bioguide | Members / IDs |
 
