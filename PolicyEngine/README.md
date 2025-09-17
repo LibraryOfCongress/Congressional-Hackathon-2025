@@ -5,6 +5,8 @@ District shapefiles are from [The Downballot's maps database](https://docs.googl
 
 The first image produced as a test was ![Income tax by district](income_tax_by_district.png).
 
+The second image shows [The Impact of Abolishing the SALT Deduction](salt_impact_by_district.png).
+
 ## Technical Notes
 
 ### Congressional District GEOID Mapping
