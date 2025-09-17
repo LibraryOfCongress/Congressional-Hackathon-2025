@@ -16,7 +16,6 @@ export async function POST(request: Request) {
             })
         })
         const json = await llmResponse.json()
-        console.log(json)
 
         return Response.json(json)
     } catch (error) {

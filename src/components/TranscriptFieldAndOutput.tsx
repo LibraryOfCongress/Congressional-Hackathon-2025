@@ -1,12 +1,34 @@
 'use client'
 
-import { useState, ChangeEvent, DragEvent, JSX } from "react";
+import axios from "axios";
+import { useState, ChangeEvent, DragEvent, JSX, useEffect } from "react";
 
-export default function TranscriptField(): JSX.Element {
+export default function TranscriptFieldAndOutput(): JSX.Element {
     
     const [fileContent, setFileContent] = useState<string>('');
     const [fileName, setFileCName] = useState<string | null>(null);
-  const [dragActive, setDragActive] = useState<boolean>(false);
+    const [aiOutput, setAIOutput] = useState<string | null>(null)
+    const [aiLoading, setAILoading] = useState<boolean>(false);
+    const [dragActive, setDragActive] = useState<boolean>(false);
+
+  useEffect(() => {
+    
+    async function callLLM() {
+        setAILoading(true)
+        try {
+            const response = await axios.post("/api", fileContent)
+            setAILoading(false)
+            setAIOutput(response.data.output[1].content[0].text)
+        } catch (error) {
+            console.error("There was an error calling the LLM", error)
+            setAILoading(false)
+        }
+    }
+    
+    if (fileContent) {
+        callLLM()
+    }
+  }, [fileContent])
 
   const handleFile = (file: File): void => {
     if (file.type !== 'text/plain') {
@@ -52,6 +74,7 @@ export default function TranscriptField(): JSX.Element {
   };
 
   return (
+    <>
     <div className="bg-gradient-to-r from-blue-500 to-red-500 animate-gradient-x p-[2px] rounded-xl">
   <div
     onDragEnter={handleDrag}
@@ -91,5 +114,22 @@ export default function TranscriptField(): JSX.Element {
     }
   </div>
 </div>
+{!aiLoading ?
+fileContent &&
+<div>
+  <p>In this transcript, the speakers map to these people:</p>
+  {aiOutput}
+</div>
+:
+<div>
+  <div className="container">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+}
+</>
   );
 }
