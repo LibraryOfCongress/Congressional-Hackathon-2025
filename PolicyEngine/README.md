@@ -1,23 +1,22 @@
 PolicyEngine at the Congressional Hackathon 7.0
 =========================================================
 
-District shapefiles are from [The Downballot's maps database](https://docs.google.com/spreadsheets/d/13XkF59JKzvw4SeSq5mbgIFrJfYjK4amg9JoQE5e9grQ/edit?gid=0#gid=0).
+This work is based on a beta version of PolicyEngine's Congressional District Level Policy Impact Estimation Framework.
 
-The first image produced as a test was ![Income tax by district](income_tax_by_district.png).
+Different shapefile approaches were used:
 
-The second image shows [The Impact of Abolishing the SALT Deduction](salt_impact_by_district.png).
+- District shapefiles are from [The Downballot's maps database](https://docs.google.com/spreadsheets/d/13XkF59JKzvw4SeSq5mbgIFrJfYjK4amg9JoQE5e9grQ/edit?gid=0#gid=0).
+- KML files from https://kml.house.gov/
 
-## SALT Deduction Impact Visualizations
+We investigated [Congressional District-level Impact of Abolishing the SALT Deduction](salt_impact_by_district.png).
 
-### Static Before/After Comparison
-![Before and After SALT Impact](salt_before_after_comparison.png)
 
-This comparison shows the income impact of abolishing the SALT deduction. Note: The "before" panel shows zero impact as a baseline since we don't have the actual pre-policy income values - only the calculated impacts from the microsimulation.
-
-### Animated Transition
+### Animated Transition Idea
 ![Animated SALT Impact](salt_impact_animation.gif)
 
-The animation transitions from the baseline (zero impact) to the final income impacts after abolishing the SALT deduction. Districts with yellow borders in the final frame are the most affected by the policy change. California districts experience the largest negative income impacts, with some losing over $1,600 per household annually.
+The animation transitions from the baseline (zero impact - would be better if they were actual values of something!) to the final income impacts after abolishing the SALT deduction. Districts with yellow borders in the final frame are the most affected by the policy change. California districts experience the largest negative income impacts, with some losing over $1,600 per household annually.
+
+It's cool to see data in motion, but there are two values so it's debateable how much value this adds
 
 ## Technical Notes
 
