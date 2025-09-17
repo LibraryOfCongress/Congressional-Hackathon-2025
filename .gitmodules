@@ -1,0 +1,3 @@
+[submodule "ctdc-congressional-tech"]
+	path = ctdc-congressional-tech
+	url = https://github.com/civictechdc/congressional-tech.git
