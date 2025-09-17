@@ -1,95 +1,19 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Archive, Calendar, FileText, Users, ExternalLink, Download, Search, Filter } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Archive, Calendar, FileText, Users, ExternalLink, Download, Search, Filter, Info } from "lucide-react"
 import Link from "next/link"
+import { db, transformMarkdownHearingForDisplay, type CongressionalHearingMarkdown } from "@/lib/supabase"
 
-// Mock data for historical hearings
-const historicalHearings = [
-  {
-    id: 1,
-    title: "Social Media Platform Accountability",
-    committee: "House Committee on Energy and Commerce",
-    date: "2023-12-15",
-    transcriptStatus: "available",
-    witnesses: ["Mark Zuckerberg", "Elon Musk", "Linda Yaccarino"],
-    pages: 247,
-    citations: 34,
-    relatedDocs: 18,
-    topics: ["Social Media", "Privacy", "Content Moderation"],
-    summary: "Hearing on social media platform accountability and content moderation practices.",
-  },
-  {
-    id: 2,
-    title: "Federal Reserve Monetary Policy Review",
-    committee: "Senate Committee on Banking, Housing, and Urban Affairs",
-    date: "2023-11-28",
-    transcriptStatus: "processing",
-    witnesses: ["Jerome Powell", "Janet Yellen"],
-    pages: 189,
-    citations: 28,
-    relatedDocs: 12,
-    topics: ["Monetary Policy", "Interest Rates", "Inflation"],
-    summary: "Semi-annual monetary policy report and economic outlook discussion.",
-  },
-  {
-    id: 3,
-    title: "Climate Change and Energy Infrastructure",
-    committee: "House Committee on Science, Space, and Technology",
-    date: "2023-10-22",
-    transcriptStatus: "available",
-    witnesses: ["Dr. Michael Mann", "Jennifer Granholm", "Dr. Susan Solomon"],
-    pages: 312,
-    citations: 67,
-    relatedDocs: 25,
-    topics: ["Climate Change", "Energy", "Infrastructure"],
-    summary: "Examination of climate change impacts on energy infrastructure and adaptation strategies.",
-  },
-  {
-    id: 4,
-    title: "Artificial Intelligence in Healthcare",
-    committee: "Senate Committee on Health, Education, Labor and Pensions",
-    date: "2023-09-18",
-    transcriptStatus: "available",
-    witnesses: ["Dr. Eric Topol", "Dr. Regina Barzilay", "Dr. Blackford Middleton"],
-    pages: 156,
-    citations: 42,
-    relatedDocs: 15,
-    topics: ["AI", "Healthcare", "Medical Technology"],
-    summary: "Exploring the potential and challenges of AI implementation in healthcare systems.",
-  },
-  {
-    id: 5,
-    title: "Cybersecurity Threats to Critical Infrastructure",
-    committee: "House Committee on Homeland Security",
-    date: "2023-08-14",
-    transcriptStatus: "available",
-    witnesses: ["Christopher Wray", "Jen Easterly", "Rob Joyce"],
-    pages: 203,
-    citations: 31,
-    relatedDocs: 22,
-    topics: ["Cybersecurity", "Infrastructure", "National Security"],
-    summary: "Assessment of cybersecurity threats facing critical infrastructure sectors.",
-  },
-  {
-    id: 6,
-    title: "Student Loan Debt Crisis",
-    committee: "Senate Committee on Health, Education, Labor and Pensions",
-    date: "2023-07-11",
-    transcriptStatus: "available",
-    witnesses: ["Miguel Cardona", "Dr. Beth Akers", "Persis Yu"],
-    pages: 178,
-    citations: 23,
-    relatedDocs: 14,
-    topics: ["Education", "Student Loans", "Higher Education"],
-    summary: "Examining the student loan debt crisis and potential policy solutions.",
-  },
-]
+// This will be populated from the database
+const historicalHearings: any[] = []
 
 const committees = [
   "All Committees",
@@ -120,8 +44,30 @@ export default function HistoricalHearings() {
   const [selectedCommittee, setSelectedCommittee] = useState("All Committees")
   const [selectedTopic, setSelectedTopic] = useState("All Topics")
   const [dateRange, setDateRange] = useState("all")
+  const [hearings, setHearings] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const filteredHearings = historicalHearings.filter((hearing) => {
+  // Load hearings from database
+  useEffect(() => {
+    async function loadHearings() {
+      try {
+        setLoading(true)
+        setError(null)
+        const markdownHearings = await db.getAllMarkdownHearings()
+        const transformedHearings = markdownHearings.map(transformMarkdownHearingForDisplay)
+        setHearings(transformedHearings)
+      } catch (err) {
+        console.error('Error loading hearings:', err)
+        setError(err instanceof Error ? err.message : 'Failed to load hearings')
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadHearings()
+  }, [])
+
+  const filteredHearings = hearings.filter((hearing) => {
     const matchesSearch =
       hearing.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       hearing.committee.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -171,6 +117,22 @@ export default function HistoricalHearings() {
         </div>
       </div>
 
+      {/* Data source info */}
+      <Alert>
+        <Info className="h-4 w-4" />
+        <AlertDescription>
+          Showing {hearings.length} hearings from your database. Some fields (witnesses, topics, detailed summaries) are placeholders and will be enhanced in future updates.
+        </AlertDescription>
+      </Alert>
+
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>
+            Error loading hearings: {error}
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Stats Overview */}
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
@@ -179,8 +141,8 @@ export default function HistoricalHearings() {
             <Archive className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,247</div>
-            <p className="text-xs text-muted-foreground">Since 2020</p>
+            <div className="text-2xl font-bold">{loading ? "..." : hearings.length}</div>
+            <p className="text-xs text-muted-foreground">In database</p>
           </CardContent>
         </Card>
         <Card>
@@ -189,28 +151,32 @@ export default function HistoricalHearings() {
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,089</div>
-            <p className="text-xs text-muted-foreground">87% coverage</p>
+            <div className="text-2xl font-bold">{loading ? "..." : hearings.length}</div>
+            <p className="text-xs text-muted-foreground">100% coverage</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Citations Tracked</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Words</CardTitle>
             <ExternalLink className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12,456</div>
-            <p className="text-xs text-muted-foreground">Cross-referenced</p>
+            <div className="text-2xl font-bold">
+              {loading ? "..." : hearings.reduce((sum, h) => sum + (h.wordCount || 0), 0).toLocaleString()}
+            </div>
+            <p className="text-xs text-muted-foreground">Full content</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Related Documents</CardTitle>
+            <CardTitle className="text-sm font-medium">Content Sources</CardTitle>
             <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">8,923</div>
-            <p className="text-xs text-muted-foreground">Linked resources</p>
+            <div className="text-2xl font-bold">
+              {loading ? "..." : new Set(hearings.map(h => h.contentSource)).size}
+            </div>
+            <p className="text-xs text-muted-foreground">PDF, govinfo, etc.</p>
           </CardContent>
         </Card>
       </div>
@@ -298,14 +264,41 @@ export default function HistoricalHearings() {
 
       {/* Hearings List */}
       <div className="space-y-4">
-        {filteredHearings.map((hearing) => (
+        {loading ? (
+          // Loading skeletons
+          Array.from({ length: 3 }).map((_, i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-6 w-3/4 mb-2" />
+                <Skeleton className="h-4 w-1/2 mb-2" />
+                <Skeleton className="h-4 w-full" />
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-4">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-4 w-18" />
+                  <Skeleton className="h-4 w-20" />
+                </div>
+                <Skeleton className="h-8 w-full" />
+              </CardContent>
+            </Card>
+          ))
+        ) : filteredHearings.map((hearing) => (
           <Card key={hearing.id} className="hover:shadow-md transition-shadow">
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="space-y-2">
                   <CardTitle className="text-xl text-balance">{hearing.title}</CardTitle>
                   <CardDescription>{hearing.committee}</CardDescription>
-                  <p className="text-sm text-muted-foreground">{hearing.summary}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {hearing.summary}
+                    {hearing.summary === "Summary to be extracted from markdown content" && (
+                      <Badge variant="outline" className="ml-2 text-xs">
+                        Placeholder
+                      </Badge>
+                    )}
+                  </p>
                 </div>
                 <Badge className={getTranscriptStatusColor(hearing.transcriptStatus)}>{hearing.transcriptStatus}</Badge>
               </div>
@@ -336,6 +329,9 @@ export default function HistoricalHearings() {
                   {hearing.topics.map((topic, index) => (
                     <Badge key={index} variant="secondary">
                       {topic}
+                      {topic === "Topics to be extracted from content" && (
+                        <span className="ml-1 text-xs opacity-60">(placeholder)</span>
+                      )}
                     </Badge>
                   ))}
                 </div>
@@ -348,6 +344,9 @@ export default function HistoricalHearings() {
                   {hearing.witnesses.map((witness, index) => (
                     <Badge key={index} variant="outline">
                       {witness}
+                      {witness === "Witness information not yet extracted" && (
+                        <span className="ml-1 text-xs opacity-60">(placeholder)</span>
+                      )}
                     </Badge>
                   ))}
                 </div>
@@ -377,7 +376,7 @@ export default function HistoricalHearings() {
         ))}
       </div>
 
-      {filteredHearings.length === 0 && (
+      {!loading && filteredHearings.length === 0 && (
         <Card>
           <CardContent className="text-center py-8">
             <Archive className="h-12 w-12 text-muted-foreground mx-auto mb-4" />

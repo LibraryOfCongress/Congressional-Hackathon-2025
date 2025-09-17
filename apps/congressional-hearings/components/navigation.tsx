@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Calendar, FileText, Search, Archive, Settings } from "lucide-react"
+import { Calendar, FileText, Search, Archive, Settings, BookOpen } from "lucide-react"
 
 const navigation = [
   {
@@ -36,6 +36,12 @@ const navigation = [
     href: "/search",
     icon: Search,
     description: "Search across all documents and transcripts",
+  },
+  {
+    name: "GAO Reports",
+    href: "/gao-reports",
+    icon: BookOpen,
+    description: "Browse and analyze Government Accountability Office reports",
   },
 ]
 

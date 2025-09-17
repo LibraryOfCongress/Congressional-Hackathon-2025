@@ -1,6 +1,0 @@
----
-alwaysApply: true
-description: Prefer functions over classes unless persistent mutable state is needed
----
-
-Prefer functions over classes. Use classes only when persistent mutable state over time is required.
