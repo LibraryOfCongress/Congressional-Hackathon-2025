@@ -1,5 +1,4 @@
 import TranscriptFieldAndOutput from "@/components/TranscriptFieldAndOutput";
-import Image from "next/image";
 
 export default function Home() {
   return (

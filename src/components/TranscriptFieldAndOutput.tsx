@@ -118,7 +118,7 @@ export default function TranscriptFieldAndOutput(): JSX.Element {
 fileContent &&
 <div>
   <p>In this transcript, the speakers map to these people:</p>
-  {aiOutput}
+  <pre>{aiOutput}</pre>
 </div>
 :
 <div>
