@@ -1,9 +1,24 @@
 PolicyEngine at the Congressional Hackathon 7.0
 =========================================================
 
-District shapefiles are from [The Downballot's maps database](https://docs.google.com/spreadsheets/d/13XkF59JKzvw4SeSq5mbgIFrJfYjK4amg9JoQE5e9grQ/edit?gid=0#gid=0).
+This work is based on a beta version of PolicyEngine's Congressional District Level Policy Impact Estimation Framework.
 
-The first image produced as a test was ![Income tax by district](income_tax_by_district.png).
+Different shapefile approaches were used:
+
+- District shapefiles are from [The Downballot's maps database](https://docs.google.com/spreadsheets/d/13XkF59JKzvw4SeSq5mbgIFrJfYjK4amg9JoQE5e9grQ/edit?gid=0#gid=0).
+- KML files from https://kml.house.gov/
+
+We investigated Abolishing the SALT Deduction and it's impacts:
+
+![Congressional District-level Impact of Abolishing the SALT Deduction](salt_impact_by_district.png).
+
+
+### Animated Transition Idea
+![Animated SALT Impact](salt_impact_animation.gif)
+
+The animation transitions from the baseline (zero impact - would be better if they were actual values of something!) to the final income impacts after abolishing the SALT deduction. Districts with yellow borders in the final frame are the most affected by the policy change. California districts experience the largest negative income impacts, with some losing over $1,600 per household annually.
+
+It's cool to see data in motion, but there are two values so it's debateable how much value this adds
 
 ## Technical Notes
 
